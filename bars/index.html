@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SimpleChart</title>
+	<script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+</body>
+
+
+<script type="text/javascript">
+	var svgHeight = 500,
+	    svgWidth = 500;
+
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", svgWidth)
+		.attr("height", svgHeight);
+
+	//define as proporcoes do grafico
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+		width = svgWidth - margin.left - margin.right,
+    	height = svgHeight - margin.top - margin.bottom;
+
+	//g forma um grupo unico
+	var g = svg.append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var x = d3.scaleBand().rangeRound([0, width]),
+    	y = d3.scaleLinear().rangeRound([height, 0]);
+	
+    var xAxis = d3.axisBottom(x);
+
+	var yAxis = d3.axisLeft(y);
+
+    //Faz a leitura do CSV
+	d3.csv("data.csv", preDataTransformations, proccess)
+
+	//roda uma preformatacao dos dados
+	function preDataTransformations(d){
+		//transforma tudo para numerico
+		d.value = +d.value;
+		return d
+	}
+
+	//processa o grafico
+	function proccess(error, data){
+		if (error) throw error;
+
+		x.domain(data.map(function(d) { return d.letter; }));
+  		y.domain([0, d3.max(data, function(d) { return d.value; })]);
+		    
+		//cria uma coluna no grafico para cada linha do csv
+		g.selectAll("rect")
+			.data(data) //informa a fonte de dados
+			.enter()
+			.append("rect") //adiciona o objeto
+			.attr("x", function(d){return x(d.letter) + (x.bandwidth() - 20) / 2 })
+			.attr("y", function(d){return y(d.value)})
+			.attr("height",function(d){return height - y(d.value)})
+			.attr("width",25)
+			.attr("fill",function(d){return d.color});
+
+		g.append("g")
+		    .attr("class", "x axis")
+		    .attr("transform", "translate(0," + height + ")")//aqui devo colocar 40 referente a margem esquerda e somar os 20 do margem top
+		    .call(xAxis);
+
+		g.append("g")
+		    .attr("class", "y axis")
+		    .attr("transform", "translate(0,0)")//aqui devo colocar 40 referente a margem esquerda e somar os 20 do margem top
+		    .call(yAxis);
+	}
+
+
+</script>
+</html>
