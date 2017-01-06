@@ -60,7 +60,9 @@
 			.attr("y", function(d){return y(d.value)})
 			.attr("height",function(d){return height - y(d.value)})
 			.attr("width",25)
-			.attr("fill",function(d){return d.color});
+			.attr("fill",function(d){return d.color})
+			.on("mouseover",highLight)
+			.on("mouseout",lowLight);
 
 		g.append("g")
 		    .attr("class", "x axis")
@@ -73,6 +75,24 @@
 		    .call(yAxis);
 	}
 
+	var test;
+	function highLight(d, i){
+		d3.select(this)
+			.attr("fill", "orange");
+		
+		svg.append("text")
+			.text(d.value)
+			.attr("class","tooltip")
+			.attr("fill","black")
+			.attr("x",this.x.animVal.value+40)
+			.attr("y",this.y.animVal.value+35);
+	}
+
+	function lowLight(d, i){
+		d3.select(this).attr("fill", "blue");
+
+		d3.selectAll(".tooltip").remove();
+	}
 
 </script>
 </html>
