@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SimpleChart</title>
+	<script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+</body>
+
+
+<script type="text/javascript">
+	var svgHeight = 500,
+	    svgWidth = 650,
+	    radius = Math.min(svgWidth, svgHeight) / 2;
+
+	var color = d3.scaleOrdinal()
+    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", svgWidth)
+		.attr("height", svgHeight);
+
+    var arc = d3.arc()
+	    .outerRadius(radius - 10)
+	    .innerRadius(0);
+
+	
+	var labelArc = d3.arc()
+	    .outerRadius(radius - 40)
+	    .innerRadius(radius - 40);
+
+	var pie = d3.pie()
+	    .sort(null)
+	    .value(function(d) { return d.value; });
+
+
+
+	    var test;
+
+
+
+    //Faz a leitura do CSV
+	d3.csv("data.csv", preDataTransformations, proccess)
+
+	//roda uma preformatacao dos dados
+	function preDataTransformations(d){
+		//transforma tudo para numerico
+		d.value = +d.value;
+		return d
+	}
+
+	//processa o grafico
+	function proccess(error, data){
+		if (error) throw error;
+
+  		var g = svg.selectAll(".arc")
+		    .data(pie(data))
+		    .enter().append("g")
+	    	.attr("class", "arc")
+	    	.attr("transform", "translate("+svgWidth/2+","+svgHeight/2+")");
+
+	    g.append("path")
+	        .attr("d", arc)
+	        .style("fill", function(d) { return color(d.value); });
+
+	    g.append("text")
+	        .text(function(d) { return d.data.letra })
+	        .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; });
+
+	}
+
+
+</script>
+</html>
